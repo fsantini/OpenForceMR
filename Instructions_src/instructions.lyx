@@ -1,0 +1,616 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass paper
+\use_default_options true
+\begin_modules
+theorems-ams
+eqs-within-sections
+figs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Open ForceSense MR: An Open-Hardware MR-Compatible Force Sensor
+\end_layout
+
+\begin_layout Author
+Francesco Santini
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Overview
+\end_layout
+
+\begin_layout Standard
+This document contains the instructions for the building of the OpenForceSense
+ MR force sensor, an MR-Compatible force sensor composed of cheap, off-the
+ shelf components.
+ This sensor, the associated files, the arduino firmware, and the host software
+ included in this repository is open-source, distributed under the GNU General
+ Programming License (GPL) v3.
+\end_layout
+
+\begin_layout Standard
+In this current embodiment, the sensor is composed of 4 20-kgf parallel
+ beam load cells mounted on a custom aluminum frame, thus having a maximum
+ load capacity of 80kgf (784N), and an arduino shield built around the standard
+ HX711 amplifier.
+\end_layout
+
+\begin_layout Standard
+In order to make the sensor MR-compatible, nonmagnetic materials are used,
+ and accurate electromagnetic shielding is used to minimize the effects
+ of interference from the MR components.
+\end_layout
+
+\begin_layout Section
+Building the sensor head
+\end_layout
+
+\begin_layout Standard
+Please refer to the attached bill-of-materials (BOM) to acquire the required
+ components.
+ The prices indicated in the BOM are for indication and they refer to generic
+ sources available on eBay.
+\end_layout
+
+\begin_layout Subsection
+Aluminum frame
+\end_layout
+
+\begin_layout Standard
+\begin_inset Wrap figure
+lines 0
+placement O
+overhang 0in
+width "50col%"
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename beamcells_final.svg
+	lyxscale 20
+	width 25text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Shape-for-machining"
+
+\end_inset
+
+Shape for machining the aluminum parts.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The aluminum frame is composed of a top and bottom plates (one with 5-mm
+ holes, the other with 4mm), 4 spacers with two 4-mm holes each, and 4 spacers
+ with two 5-mm holes each.
+ The single pieces can be obtained from a single 150x150mm piece of aluminum
+ (thickness: 4mm) using a desktop CNC router/milling machine (we used a
+ Shapeoko 3 with a Kress 1050E spindle), or by manual machining following
+ the provided svg file (see fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Shape-for-machining"
+
+\end_inset
+
+).
+ Manually chamfer the holes of the top and bottom plates in order to have
+ the countersunk screws fit at the level of the surface.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Wrap figure
+lines 0
+placement o
+overhang 0col%
+width "50col%"
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Assembly_pic.png
+	lyxscale 30
+	width 50text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Mechanical-assembly."
+
+\end_inset
+
+Mechanical assembly.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The beam cells work by measuring the deformation in the longitudinal direction,
+ therefore they appropriately measure the torque applied between the two
+ sides of the cell, rather than the force 
+\shape italic
+per se
+\shape default
+.
+ For this reason, each cell must be mounted in a way that allows the deformation.
+ Assemble the four cells on the frame using the spacers and the M4 and M5
+ brass screws as shown in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Mechanical-assembly."
+
+\end_inset
+
+ (a 3D model as FreeCAD file is also provided).
+ Make sure to route the cables in a way that they all come out from a single
+ slit between two cells.
+\end_layout
+
+\begin_layout Subsection
+Electrical connections
+\end_layout
+
+\begin_layout Standard
+Cut all the cables coming out of the slit at the same length and solder
+ the cables of the same color together.
+ This ensures a parallel connection of the Wheatstone bridges that can therefore
+ act as a single sensor.
+\end_layout
+
+\begin_layout Standard
+Cut the connector from one end of the ethernet patch cable and expose the
+ internal cables.
+ Cut approximately 20-cm-long piece of the copper braid and slide it over
+ the ethernet cable (push the extremities of the braid to enlarge the hole).
+\end_layout
+
+\begin_layout Standard
+Connect the sensor cables to two twisted-pairs of the ethernet cable, and
+ cover the connections with heatshrink tube.
+ We used the following connections (sensor -> cable):
+\end_layout
+
+\begin_layout Itemize
+Red -> Orange
+\end_layout
+
+\begin_layout Itemize
+Black -> Orange/White
+\end_layout
+
+\begin_layout Itemize
+Green -> Green
+\end_layout
+
+\begin_layout Itemize
+White -> Green/White
+\end_layout
+
+\begin_layout Standard
+Slide the braid over the sensor cables and attach it to the aluminum frame
+ by securing it between a spacer and a plate.
+ At the other end of the braid, remove a piece of insulation from the ethernet
+ cable and fix the braid to the shielding with a cable tie (see figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Mounted-sensor-with"
+
+\end_inset
+
+).
+ For extra shielding, the whole sensor can also be wrapped in aluminium
+ foil.
+ 
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename P7260583.JPG
+	lyxscale 10
+	width 40text%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename P7260584.JPG
+	lyxscale 10
+	width 40text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Mounted-sensor-with"
+
+\end_inset
+
+Mounted sensor with shielding braid (left) and connection of the braid to
+ the cable shielding (right)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Building the Arduino shield
+\end_layout
+
+\begin_layout Standard
+\begin_inset Wrap figure
+lines 0
+placement o
+overhang 0col%
+width "50col%"
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename shield.svg
+	width 33text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Picture-of-the"
+
+\end_inset
+
+Picture of the Arduino shield.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+The Arduino shield is a simple shield built around the HX711 breakout board
+ that does not need any additional discrete component.
+ Solder the HX711 and a female RJ45 connector on the shield prototyping
+ board and connect (see fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Picture-of-the"
+
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Itemize
+HX711 Digital side (from Arduino to HX711):
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
++5V -> Vcc
+\end_layout
+
+\begin_layout Itemize
+GND -> GND
+\end_layout
+
+\begin_layout Itemize
+Pin 6 -> CLK
+\end_layout
+
+\begin_layout Itemize
+Pin 7 -> DT
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+HX711 Analog side (from HX711 to Ethernet connector):
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+E+ -> Orange cable
+\end_layout
+
+\begin_layout Itemize
+E- -> White/orange cable
+\end_layout
+
+\begin_layout Itemize
+A+ -> White/green cable
+\end_layout
+
+\begin_layout Itemize
+A- -> Green cable
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Solder the headers on the appropriate holes of the board in order to create
+ a pass-through shield.
+\end_layout
+
+\begin_layout Section
+Software and calibration
+\end_layout
+
+\begin_layout Subsection
+Arduino firmware
+\end_layout
+
+\begin_layout Standard
+The arduino firmware is based on the HX711 library (
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/bogde/HX711"
+
+\end_inset
+
+).
+ Download the latest arduino interface from 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://www.arduino.cc/"
+
+\end_inset
+
+, load the sketch and upload it onto the Arduino Uno board.
+ This firmware calculates the zero offset at initialization, and then reads
+ a value from the sensor every 100ms, converts it into some unit using the
+ SCALE factor, and prints it to serial.
+\end_layout
+
+\begin_layout Standard
+The sketch can be configured by changing the DATA_PIN and CLK_PIN constants
+ if needed, and the SCALE factor should be calibrated before first use (see
+ below).
+\end_layout
+
+\begin_layout Subsection
+Host interface
+\end_layout
+
+\begin_layout Standard
+A simple python program is provided as an interface to the force sensor.
+ It depends on the following installable modules:
+\end_layout
+
+\begin_layout Itemize
+PySerial
+\end_layout
+
+\begin_layout Itemize
+PySide (Qt implementation for Python)
+\end_layout
+
+\begin_layout Itemize
+pyqtgraph (Plotting library for python based on PySide)
+\end_layout
+
+\begin_layout Standard
+Before first use, the pyForceSense.py script should be adapted by defining
+ the SERIAL_PORT constant to the serial port value (OS dependent).
+\end_layout
+
+\begin_layout Standard
+Once started, the program initializes the serial port to the Arduino and
+ starts logging values.
+ In the green box on the left, the current measured value is displayed;
+ in the red box on the right, the maximum value is shown.
+ The last 100 measured values (corresponding to 10s) are shown as a plot
+ on the bottom, and the serial log is displayed on the right side of the
+ window (see figure ).
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename software_screenshot.png
+	width 75text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Screenshot of the host interface.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Calibration
+\end_layout
+
+\begin_layout Standard
+Before first use, the SCALE parameter in the Arduino sketch must be calibrated.
+ The procedure is simple and it involves a known weight or reliable dynamometer.
+ Load the default sketch on the Arduino and open the host interface.
+ After initialization, place the known weight on the sensor.
+ The new scale factor can be calculated as: 
+\begin_inset Formula 
+\[
+SCALE_{new}=\frac{SCALE_{old}\cdot WEIGHT_{measured}}{WEIGHT_{known}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the scale is inversely proportional to the weight.
+ Replace the new SCALE value in the Arduino sketch and upload the firmware
+ again.
+\end_layout
+
+\end_body
+\end_document
