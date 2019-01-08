@@ -1,4 +1,4 @@
-OpenForceSense MR
+OpenForce MR
 =================
 
 This repository contains all the information to build the OpenForceSense MR force sensor, an MR-Compatible force sensor composed of cheap, off-the shelf components. This sensor, the associated files, the arduino firmware, and the host software included in this repository is open-source, distributed under the GNU General Programming License (GPL) v3.
