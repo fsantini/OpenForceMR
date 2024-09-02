@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Aug 30 16:59:09 2024
+
+@author: sabine
+"""
+
 import sys
 import glob
 import serial
@@ -6,35 +14,24 @@ import time
 from datetime import datetime
 import os.path
 
-#import PySide
-import PyQt4
 import pyqtgraph as pg
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from pyForceSense_ui import Ui_PyForceSenseWidget
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from pyForceSense_ui import Ui_PyForceSenseWidget  # Assuming this was generated with pyuic5
 
 BAUD = 9600
-#SERIAL_PORT = '/dev/ttyUSB0'
-#SERIAL_PORT = '/dev/ttyS98'
 SERIAL_TIMER_INTERVAL = 20
 MAXPLOTLENGTH = 100
 
-forceStringPattern = re.compile('Force: ([-.0-9]+)')
+forceStringPattern = re.compile(r'Force: ([-.0-9]+)')
 
 def serial_ports():
-    """ Lists serial port names
-
-        :raises EnvironmentError:
-            On unsupported or unknown platforms
-        :returns:
-            A list of the serial ports available on the system
-    """
+    """ Lists serial port names """
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in range(256)]
     elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-        # this excludes your current terminal "/dev/tty"
         ports = glob.glob('/dev/tty[A-Za-z]*')
-        #ports = glob.glob('/dev/pts/2')
     elif sys.platform.startswith('darwin'):
         ports = glob.glob('/dev/tty.*')
     else:
@@ -52,8 +49,8 @@ def serial_ports():
 
 class PyForceSense(Ui_PyForceSenseWidget, QWidget):
     
-    def __init__(self, parent = None):
-        QWidget.__init__(self, parent)
+    def __init__(self, parent=None):
+        super(PyForceSense, self).__init__(parent)
         self.setupUi(self)
         self.maxForce = 0.0
         self.curForce = 0.0
@@ -69,7 +66,7 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         self.logging = False
         self.logButton.clicked.connect(self.toggleLog)
         self.logFile = None
-        self.clearButton.clicked.connect(lambda : self.serialOutputText.setPlainText(""));
+        self.clearButton.clicked.connect(lambda: self.serialOutputText.setPlainText(""))
         self.resetTareButton.clicked.connect(self.resetTare)
         self.serial = None
         self.autoName()
@@ -79,11 +76,10 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         if not self.checkSerialAvailable(): return
         ans = QMessageBox.warning(self, "Reset", "Resetting tare. Are you sure?", QMessageBox.Yes | QMessageBox.No)
         if ans == QMessageBox.Yes:
-            self.serial.write("RESET\n");
+            self.serial.write(b"RESET\n")
         
     def toggleLog(self):
         if self.logging:
-            # stop logging
             self.logging = False
             self.logButton.setText("Start logging")
             self.logButton.setStyleSheet("")
@@ -119,7 +115,6 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         
     def serialConnect(self):
         if self.serial is not None:
-            # we are already connected
             ans = QMessageBox.warning(self, "Disconnect", "Are you sure you want to disconnect?", QMessageBox.Yes | QMessageBox.No)
             if ans == QMessageBox.Yes:
                 self.serialDisconnect()
@@ -146,7 +141,6 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         
     def checkSerialAvailable(self):
         if not self.serial or not self.serial.readable():
-            # reset serial connection
             self.serialDisconnect()
             return False
         return True
@@ -155,8 +149,7 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         if not self.checkSerialAvailable(): return
         if self.serial.in_waiting:
             serStr = self.serial.readline().strip()
-            #print serStr
-            self.processSerial(serStr)
+            self.processSerial(serStr.decode())
 
     def makeLine(self, value):
         line = pg.InfiniteLine(movable=False, angle=90, pen=self.yellowPen, pos=value)
@@ -164,10 +157,9 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         return line
 
     def processSerial(self, serialString):
-        #self.serialOutputText.appendPlainText(str)
-        m = forceStringPattern.match(serialString) 
+        m = forceStringPattern.match(serialString)
         if m is not None:
-            self.curForce = float(m.group(1));
+            self.curForce = float(m.group(1))
             if self.curForce > self.maxForce: self.maxForce = self.curForce
             if self.logFile:
                 timestamp = time.time()
@@ -183,13 +175,11 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
             
     def closeEvent(self, event):
         if self.logFile:
-            print "Saving log"
+            print("Saving log")
             self.logFile.close()
-            
         event.accept()
             
     def resetMax(self):
-        #self.serialOutputText.clear()
         self.maxForce = 0.0
         self.updateUi()
             
@@ -199,7 +189,6 @@ class PyForceSense(Ui_PyForceSenseWidget, QWidget):
         self.plotData.append(self.curForce)
         while len(self.plotData) > MAXPLOTLENGTH: 
             self.plotData.pop(0)
-            # update trigPositions. Remove positions in the past
             while len(self.trigPositions) > 0 and self.trigPositions[0].value() <= 0:
                 self.forcePlot.removeItem(self.trigPositions[0])
                 self.trigPositions.pop(0)
@@ -213,5 +202,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = PyForceSense()
     window.show()
-
     sys.exit(app.exec_())
